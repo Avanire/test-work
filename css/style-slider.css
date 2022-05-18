@@ -1,0 +1,66 @@
+.container {
+    width: 1440px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.slider {
+    display: block;
+    width: 1024px;
+    height: 500px;
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto;
+}
+
+.slider-list {
+    position: relative;
+}
+
+.slide {
+    float: left;
+    position: relative;
+}
+
+
+.prev {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+}
+
+.next {
+    position: absolute;
+    top: 50%;
+    right: 10%;
+}
+
+.slider-dots {
+    display: flex;
+    width: 250px;
+    justify-content: space-around;
+    margin: 25px auto 0;
+}
+
+.slider-dot {
+    width: 11px;
+    height: 11px;
+    display: block;
+    cursor: pointer;
+    border: 1px solid #333;
+    border-radius: 50%;
+    position: relative;
+}
+
+.slider-dot.active::after {
+    content: '';
+    border: 2px solid #333;
+    width: 1px;
+    height: 1px;
+    display: block;
+    background: #333;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    border-radius: 50%;
+}

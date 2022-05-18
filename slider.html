@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/style-slider.css">
+</head>
+<body>
+<div class="container">
+    <button class="prev"> <</button>
+    <div class="slider">
+        <div class="slider-list">
+
+            <div class="slide"><img src="img/1.jpg" alt=""></div>
+            <div class="slide"><img src="img/2.jpg" alt=""></div>
+            <div class="slide"><img src="img/3.jpg" alt=""></div>
+            <div class="slide"><img src="img/4.jpg" alt=""></div>
+            <div class="slide"><img src="img/5.jpg" alt=""></div>
+            <div class="slide"><img src="img/6.jpg" alt=""></div>
+            <div class="slide"><img src="img/7.jpg" alt=""></div>
+            <div class="slide"><img src="img/8.jpg" alt=""></div>
+
+        </div>
+
+    </div>
+    <button class="next"> ></button>
+    <div class="slider-dots"></div>
+</div>
+<script>
+    const slider = document.querySelector('.slider');
+    const sliderWidth = slider.clientWidth;
+    const slides = document.querySelectorAll('.slide');
+    const sliderContainer = document.querySelector('.slider-list');
+    sliderContainer.style.width = (slides.length + 2) * sliderWidth + 'px';
+    sliderContainer.style.transform = 'translate3d(-' + sliderWidth + 'px, 0px, 0px)';
+    let startPosition = -sliderWidth;
+    const next = document.querySelector('.next');
+    const prev = document.querySelector('.prev');
+    let animationInProgress = false;
+    const dots = document.querySelector('.slider-dots');
+    let currentDotNum = 1;
+    slideDotAdd();
+
+    function slideDotAdd() {
+        const dotRef = document.createElement('span');
+        dotRef.classList.add('slider-dot');
+
+        for (let i = 1; i <= slides.length; i++) {
+            let clone = dotRef.cloneNode();
+
+            if (i === 1) {
+                clone.classList.add('active');
+            }
+
+            clone.dataset.num = i;
+
+            dots.append(clone);
+
+            handleClick(clone);
+        }
+    }
+
+    function handleClick(item) {
+        item.addEventListener('click', () => {
+            deleteActiveDot();
+            currentDotNum = item.dataset.num;
+            item.classList.add('active');
+            sliderContainer.style.transform = 'translate3d(-' + (item.dataset.num * sliderWidth) + 'px, 0px, 0px)';
+        })
+    }
+
+    function deleteActiveDot() {
+        let dots = document.querySelectorAll('.slider-dot');
+        Array.from(dots).map(elem => elem.classList.remove('active'));
+    }
+
+    let cloneFirstSlide = slides[0].cloneNode(true);
+    sliderContainer.append(cloneFirstSlide);
+    let cloneLastSlide = slides[slides.length - 1].cloneNode(true);
+    sliderContainer.prepend(cloneLastSlide);
+
+    next.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        if (animationInProgress) {
+            return;
+        }
+
+        let matrix = new WebKitCSSMatrix(sliderContainer.style.transform);
+        startPosition = matrix.m41;
+
+        nextSlide(startPosition);
+
+    });
+
+    function nextSlide(startPosition, direction) {
+        animationInProgress = true;
+        let start = Date.now();
+        currentDotNum++;
+
+        let timer = setInterval(function () {
+            let timePassed = Date.now() - start;
+            let total = timePassed * 1.8 - startPosition;
+
+            if (total >= Math.abs(startPosition) + sliderWidth) {
+                total = (total - total % sliderWidth);
+
+                clearInterval(timer);
+                animationInProgress = false;
+
+                if ((parseInt(sliderContainer.style.width) - total) === sliderWidth) {
+                    sliderContainer.style.transform = 'translate3d(-' + sliderWidth + 'px, 0px, 0px)';
+                    return;
+                }
+            }
+
+
+            sliderContainer.style.transform = 'translate3d(-' + total + 'px, 0px, 0px)';
+        }, 24);
+
+        deleteActiveDot();
+
+        if (currentDotNum > slides.length) {
+            currentDotNum = 1;
+        }
+
+        let activeDot = document.querySelector('.slider-dot[data-num="' + currentDotNum + '"]');
+        activeDot.classList.add('active');
+    }
+
+    prev.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        if (animationInProgress) {
+            return;
+        }
+
+        let matrix = new WebKitCSSMatrix(sliderContainer.style.transform);
+        startPosition = matrix.m41;
+
+
+        prevSlide(startPosition);
+
+    });
+
+    function prevSlide(startPosition) {
+        animationInProgress = true;
+        let start = Date.now();
+        currentDotNum--;
+
+        let timer = setInterval(function () {
+            let timePassed = Date.now() - start;
+            let total = startPosition + timePassed * 1.8;
+
+            if (Math.abs(startPosition) - sliderWidth  >= Math.abs(total)) {
+                total = -(sliderWidth - Math.abs(total % sliderWidth)) + total;
+
+
+                clearInterval(timer);
+                animationInProgress = false;
+
+
+            } else if (total >= 0) {
+                sliderContainer.style.transform = 'translate3d(-' + (parseInt(sliderContainer.style.width) - sliderWidth * 2) + 'px, 0px, 0px)';
+
+                clearInterval(timer);
+                animationInProgress = false;
+                return;
+            }
+
+            sliderContainer.style.transform = 'translate3d(' + total + 'px, 0px, 0px)';
+        }, 24);
+
+        deleteActiveDot();
+
+        if (currentDotNum < 1) {
+            currentDotNum = slides.length;
+        }
+
+        let activeDot = document.querySelector('.slider-dot[data-num="' + currentDotNum + '"]');
+        activeDot.classList.add('active');
+    }
+
+
+</script>
+</body>
+</html>
